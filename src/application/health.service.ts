@@ -1,11 +1,14 @@
+import { InternalError } from "./errors";
+
 export type HealthStatus = {
     status: "ok";
     timestamp: number;
 };
 
 export function getHealthStatus(): HealthStatus {
-    return {
-        status: "ok",
-        timestamp: Date.now(),
-    };
+    throw new InternalError("Health Check Failed");
+    // return {
+    //     status: "ok",
+    //     timestamp: Date.now(),
+    // };
 }
