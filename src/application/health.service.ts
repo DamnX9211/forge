@@ -1,4 +1,5 @@
 import { InternalError } from "./errors";
+import { Email } from "../domain/user/email.vo";
 
 export type HealthStatus = {
     status: "ok";
@@ -12,3 +13,5 @@ export function getHealthStatus(): HealthStatus {
     //     timestamp: Date.now(),
     // };
 }
+
+Email.create("test@example.com");
