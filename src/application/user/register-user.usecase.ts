@@ -1,0 +1,30 @@
+import { Email } from "../../domain/user/email.vo";
+import { Password } from "../../domain/user/password.vo";
+import { User } from "../../domain/user/user.entity";
+import { randomUUID } from "node:crypto";
+
+export type RegisterUserInput = {
+    email: string;
+    password: string;
+};
+
+export type RegisterUserOutput = {
+    id: string;
+    email: string;
+    createdAt: Date;
+};
+
+export function registerUser(
+    input: RegisterUserInput
+): RegisterUserOutput {
+    const email = Email.create(input.email);
+    const password = Password.create(input.password);
+
+    const user = User.create(randomUUID(), email, password);
+
+    return {
+        id: user.getId(),
+        email: user.getEmail().getValue(),
+        createdAt: user.getCreatedAt(),
+    }
+}
