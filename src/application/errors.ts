@@ -11,3 +11,8 @@ export class InternalError extends AppError {
     statusCode = 500;
     code = "INTERNAL_ERROR";
 }
+
+export class ValidationError extends AppError {
+    statusCode = 400;
+    code = "VALIDATION_ERROR";
+}
