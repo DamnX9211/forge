@@ -3,6 +3,7 @@ import { RegisterRequestDTO, RegisterResponseDTO } from "./types/user.dto";
 import { registerUser } from "../application/user/register-user.usecase";
 import { registerUserSchema } from "./types/user.dto";
 import { ValidationError } from "../application/errors";
+import { SqliteUserRepository } from "../infrastructure/user/user.repository.sqlite";
 
 export function registerUserController(
     req: Request,
@@ -13,8 +14,8 @@ export function registerUserController(
     if(!parsed.success) {
         throw new ValidationError(parsed.error.message);
     }
-
-    const result = registerUser(parsed.data);
+    const userRepo = new SqliteUserRepository();
+    const result = registerUser(parsed.data, userRepo);
 
     const response: RegisterResponseDTO = {
         id: result.id,

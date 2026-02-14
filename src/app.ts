@@ -1,4 +1,4 @@
-import express, { Application, Request, Response, NextFunction } from "express";
+import express, { Application } from "express";
 import { healthcontroller } from "./api/health.controller";
 import { errorMiddleware } from "./api/error.middleware";
 import { registerUserController } from "./api/user.controller";

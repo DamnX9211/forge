@@ -2,6 +2,8 @@ import { Email } from "../../domain/user/email.vo";
 import { Password } from "../../domain/user/password.vo";
 import { User } from "../../domain/user/user.entity";
 import { randomUUID } from "node:crypto";
+import { UserRepository } from "../../domain/user/user.repository";
+import { ValidationError } from "../errors";
 
 export type RegisterUserInput = {
     email: string;
@@ -15,12 +17,21 @@ export type RegisterUserOutput = {
 };
 
 export function registerUser(
-    input: RegisterUserInput
+    input: RegisterUserInput,
+    userRepo: UserRepository
 ): RegisterUserOutput {
+
+    const existing = userRepo.findByEmail(input.email);
+    if(existing) {
+        throw new ValidationError("Email already in use");
+    }
+
     const email = Email.create(input.email);
     const password = Password.create(input.password);
 
     const user = User.create(randomUUID(), email, password);
+
+    userRepo.save(user);
 
     return {
         id: user.getId(),
