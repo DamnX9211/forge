@@ -4,6 +4,7 @@ import { User } from "../../domain/user/user.entity";
 import { randomUUID } from "node:crypto";
 import { UserRepository } from "../../domain/user/user.repository";
 import { ValidationError } from "../errors";
+import { PasswordHasher } from "../../domain/user/password-hasher";
 
 export type RegisterUserInput = {
     email: string;
@@ -18,7 +19,8 @@ export type RegisterUserOutput = {
 
 export function registerUser(
     input: RegisterUserInput,
-    userRepo: UserRepository
+    userRepo: UserRepository,
+    hasher: PasswordHasher
 ): RegisterUserOutput {
 
     const existing = userRepo.findByEmail(input.email);
@@ -27,7 +29,9 @@ export function registerUser(
     }
 
     const email = Email.create(input.email);
-    const password = Password.create(input.password);
+    const validatePassword = Password.create(input.password);
+    const hashedPassword = hasher.hash(validatePassword.getValue());
+    const password = Password.create(hashedPassword)
 
     const user = User.create(randomUUID(), email, password);
 

@@ -4,6 +4,7 @@ import { registerUser } from "../application/user/register-user.usecase";
 import { registerUserSchema } from "./types/user.dto";
 import { ValidationError } from "../application/errors";
 import { SqliteUserRepository } from "../infrastructure/user/user.repository.sqlite";
+import { BcryptPasswordHasher } from "../infrastructure/security/bcrypt-password-hasher";
 
 export function registerUserController(
     req: Request,
@@ -15,7 +16,8 @@ export function registerUserController(
         throw new ValidationError(parsed.error.message);
     }
     const userRepo = new SqliteUserRepository();
-    const result = registerUser(parsed.data, userRepo);
+    const hasher = new BcryptPasswordHasher();
+    const result = registerUser(parsed.data, userRepo, hasher);
 
     const response: RegisterResponseDTO = {
         id: result.id,
