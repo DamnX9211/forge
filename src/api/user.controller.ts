@@ -5,6 +5,8 @@ import { registerUserSchema } from "./types/user.dto";
 import { ValidationError } from "../application/errors";
 import { SqliteUserRepository } from "../infrastructure/user/user.repository.sqlite";
 import { BcryptPasswordHasher } from "../infrastructure/security/bcrypt-password-hasher";
+import { loginUser } from "../application/user/login-user.usecase";
+import { JwtTokenService } from "../infrastructure/security/jwt-token-service";
 
 export function registerUserController(
     req: Request,
@@ -26,4 +28,21 @@ export function registerUserController(
     
     };
     res.status(201).json(response);
+}
+
+export function loginUserController(req: Request, res: Response): void {
+    const { email, password} = req.body;
+
+    const userRepo = new SqliteUserRepository();
+    const hasher = new BcryptPasswordHasher();
+    const tokenService = new JwtTokenService();
+
+    const result = loginUser(
+        { email, password },
+        userRepo,
+        hasher,
+        tokenService
+    );
+
+    res.status(200).json(result);
 }
