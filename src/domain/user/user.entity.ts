@@ -27,6 +27,7 @@ export class User {
         return this.props.id;
     }
 
+
     getEmail(): Email {
         return this.props.email;
     }

@@ -8,41 +8,54 @@ import { BcryptPasswordHasher } from "../infrastructure/security/bcrypt-password
 import { loginUser } from "../application/user/login-user.usecase";
 import { JwtTokenService } from "../infrastructure/security/jwt-token-service";
 
+
 export function registerUserController(
-    req: Request,
-    res: Response<RegisterResponseDTO>
+  req: Request,
+  res: Response<RegisterResponseDTO>,
 ): void {
-    const parsed = registerUserSchema.safeParse(req.body);
+  const parsed = registerUserSchema.safeParse(req.body);
 
-    if(!parsed.success) {
-        throw new ValidationError(parsed.error.message);
-    }
-    const userRepo = new SqliteUserRepository();
-    const hasher = new BcryptPasswordHasher();
-    const result = registerUser(parsed.data, userRepo, hasher);
+  if (!parsed.success) {
+    throw new ValidationError(parsed.error.message);
+  }
+  const userRepo = new SqliteUserRepository();
+  const hasher = new BcryptPasswordHasher();
+  const result = registerUser(parsed.data, userRepo, hasher);
 
-    const response: RegisterResponseDTO = {
-        id: result.id,
-        email: result.email,
-        createdAt: result.createdAt.toISOString(),
-    
-    };
-    res.status(201).json(response);
+  const response: RegisterResponseDTO = {
+    id: result.id,
+    email: result.email,
+    createdAt: result.createdAt.toISOString(),
+  };
+  res.status(201).json(response);
 }
 
 export function loginUserController(req: Request, res: Response): void {
-    const { email, password} = req.body;
+  const { email, password } = req.body;
 
-    const userRepo = new SqliteUserRepository();
-    const hasher = new BcryptPasswordHasher();
-    const tokenService = new JwtTokenService();
+  const userRepo = new SqliteUserRepository();
+  const hasher = new BcryptPasswordHasher();
+  const tokenService = new JwtTokenService();
 
-    const result = loginUser(
-        { email, password },
-        userRepo,
-        hasher,
-        tokenService
-    );
+  const result = loginUser({ email, password }, userRepo, hasher, tokenService);
 
-    res.status(200).json(result);
+  res.status(200).json(result);
+}
+
+export function getMeController(req: Request, res: Response): void {
+  const user = (req as any).user;
+  if (!user) {
+    res.status(401).json({
+      error: {
+        code: "UNAUTHORIZED",
+        message: "Unauthorized",
+      },
+    });
+    return;
+  }
+
+  res.status(200).json({
+    id: user.userId,
+    email: user.email,
+  });
 }

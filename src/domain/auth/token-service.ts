@@ -1,4 +1,6 @@
+import { AuthPayload } from "./auth-payload";
+
 export interface TokenService {
-    sign(payload: object): string;
-    verify(token: string): object;
+    sign(payload: AuthPayload): string;
+    verify(token: string): AuthPayload;
 }
