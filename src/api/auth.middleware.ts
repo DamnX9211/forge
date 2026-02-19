@@ -1,9 +1,8 @@
 import {Request, Response, NextFunction } from "express";
 import { JwtTokenService } from "../infrastructure/security/jwt-token-service";
 import { ValidationError } from "../application/errors";
+import { container } from "../container";
 
-
-const tokenService = new JwtTokenService();
 
 export function authMiddleware(
     req: Request,
@@ -18,10 +17,10 @@ export function authMiddleware(
     const token = authHeader.split(" ")[1];
 
     try {
-        const payload = tokenService.verify(token);
+        const payload = container.tokenService.verify(token);
         (req as any).user = payload;
         next();
-    } catch {
+    } catch (error) {
         throw new ValidationError("Invalid or expired token");
     }
 }

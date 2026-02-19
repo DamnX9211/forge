@@ -7,6 +7,7 @@ import { SqliteUserRepository } from "../infrastructure/user/user.repository.sql
 import { BcryptPasswordHasher } from "../infrastructure/security/bcrypt-password-hasher";
 import { loginUser } from "../application/user/login-user.usecase";
 import { JwtTokenService } from "../infrastructure/security/jwt-token-service";
+import { container } from "../container";
 
 
 export function registerUserController(
@@ -18,8 +19,8 @@ export function registerUserController(
   if (!parsed.success) {
     throw new ValidationError(parsed.error.message);
   }
-  const userRepo = new SqliteUserRepository();
-  const hasher = new BcryptPasswordHasher();
+  const userRepo = container.userRepository;
+  const hasher = container.passwordHasher;
   const result = registerUser(parsed.data, userRepo, hasher);
 
   const response: RegisterResponseDTO = {
@@ -33,9 +34,9 @@ export function registerUserController(
 export function loginUserController(req: Request, res: Response): void {
   const { email, password } = req.body;
 
-  const userRepo = new SqliteUserRepository();
-  const hasher = new BcryptPasswordHasher();
-  const tokenService = new JwtTokenService();
+  const userRepo =  container.userRepository;
+  const hasher = container.passwordHasher;
+  const tokenService = container.tokenService;
 
   const result = loginUser({ email, password }, userRepo, hasher, tokenService);
 
