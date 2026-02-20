@@ -9,4 +9,10 @@ export function initializeDatabase(): void {
         password TEXT NOT NULL,
         created_at TEXT NOT NULL
         );`);
+    db.exec(`CREATE TABLE IF NOT EXISTS refresh_tokens (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        token TEXT NOT NULL,
+        expires_at TEXT NOT NULL
+        );`);
 }
