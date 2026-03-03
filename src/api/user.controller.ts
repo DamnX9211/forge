@@ -8,6 +8,8 @@ import { BcryptPasswordHasher } from "../infrastructure/security/bcrypt-password
 import { loginUser } from "../application/user/login-user.usecase";
 import { JwtTokenService } from "../infrastructure/security/jwt-token-service";
 import { container } from "../container";
+import { RefreshToken } from "../domain/auth/refresh-token.entity";
+import { refreshAccessToken } from "../application/auth/refresh-token.usecase";
 
 
 export function registerUserController(
@@ -37,8 +39,9 @@ export function loginUserController(req: Request, res: Response): void {
   const userRepo =  container.userRepository;
   const hasher = container.passwordHasher;
   const tokenService = container.tokenService;
+  const refreshTokenRepo = container.refreshTokenRepository;
 
-  const result = loginUser({ email, password }, userRepo, hasher, tokenService);
+  const result = loginUser({ email, password }, userRepo, hasher, tokenService, refreshTokenRepo);
 
   res.status(200).json(result);
 }
@@ -59,4 +62,15 @@ export function getMeController(req: Request, res: Response): void {
     id: user.userId,
     email: user.email,
   });
+}
+
+export function refreshTokenController(req: Request, res: Response) {
+ const { refreshToken } = req.body;
+
+ const result = refreshAccessToken(
+  refreshToken,
+  container.refreshTokenRepository,
+  container.tokenService
+ )
+ res.status(200).json(result);
 }
